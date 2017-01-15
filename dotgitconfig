@@ -1,0 +1,6 @@
+[user]
+	signingkey = 0x8F8E8868E5E52CAF
+[gpg]
+	program = /usr/bin/gpg2
+[commit]
+	gpgsign = true
