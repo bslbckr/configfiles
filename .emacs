@@ -1,3 +1,34 @@
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'menu-bar-mode) (menu-bar-mode 1))
+
+(require 'package)
+(setq package-enable-at-startup nil)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
+(package-initialize)
+
+;; don't use tabs for indentation
+(setq-default indent-tabs-mode nil)
+
+;; ido mode
+(require 'ido)
+(setq ido-enable-flex-matching t)
+(setq ido-everywhere t)
+(ido-mode 1)
+
+;; set up org mode
+(setq org-startup-indented t)
+(setq org-startup-folded "showall")
+;; (setq org-directory "~/org")
+
+;; install use-package
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+
 (eval-when-compile
   (require 'use-package))
 
@@ -13,10 +44,10 @@
  '(global-font-lock-mode t nil (font-lock))
  '(js2-mode-show-parse-errors t)
  '(js2-mode-show-strict-warnings t)
- '(package-archives
-   (quote
-    (("gnu" . "http://elpa.gnu.org/packages/")
-     ("melpa" . "https://melpa.org/packages/"))))
+ ;;'(package-archives
+ ;  (quote
+ ;   (("gnu" . "http://elpa.gnu.org/packages/")
+ ;    ("melpa" . "https://melpa.org/packages/"))))
  '(show-paren-mode t nil (paren))
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(transient-mark-mode t))
@@ -33,7 +64,7 @@
 ;;(define-key js-mode-map "{" 'paredit-open-curly)
 ;;(define-key js-mode-map "}" 'paredit-close-curly-and-newline)
 
-
+(use-package tex :ensure auctex)
 (use-package auctex
   :ensure t
   :mode ("\\.tex\\'" . latex-mode))
@@ -57,3 +88,12 @@
 (use-package web-mode
   :ensure t
   :mode ("\\.html\\'" . web-mode))
+(use-package atom-one-dark-theme
+  :ensure t
+  :load-path "themes"
+  :config 
+  (load-theme 'atom-one-dark t))
+
+(use-package ace-jump-mode
+  :ensure t
+  :bind ("C-." . ace-jump-mode))
