@@ -5,7 +5,7 @@
 (require 'package)
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/"))
+;;(add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/"))
 (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
 (package-initialize)
 
@@ -19,6 +19,7 @@
 (ido-mode 1)
 
 ;; set up org mode
+(require 'org)
 (setq org-startup-indented t)
 (setq org-startup-folded "showall")
 ;; (setq org-directory "~/org")
@@ -64,6 +65,9 @@
 ;;(define-key js-mode-map "{" 'paredit-open-curly)
 ;;(define-key js-mode-map "}" 'paredit-close-curly-and-newline)
 
+;; required when using byte-compiled .emacs together with use-package
+(require 'bind-key)
+
 (use-package tex :ensure auctex)
 (use-package auctex
   :ensure t
@@ -93,7 +97,55 @@
   :load-path "themes"
   :config 
   (load-theme 'atom-one-dark t))
-
 (use-package ace-jump-mode
   :ensure t
   :bind ("C-." . ace-jump-mode))
+(use-package flycheck
+  :ensure t
+  :init
+  (setq
+   flycheck-checkers
+   '(typescript-tide
+     javascript-tide
+     ;;   jsx-tide
+     css-csslint
+     emacs-lisp
+     ;; haml
+     javascript-eslint
+     json-jsonlint
+     yaml-jsyaml))
+  :config
+  (global-flycheck-mode))
+(use-package company
+  :ensure t
+  :init
+  (setq company-tooltip-align-annotations t
+        company-tooltip-minimum-width 30)
+  :config
+  (global-company-mode)
+  :bind
+  ("M-<tab>" . company-complete))
+
+(defun setup-tide-mode ()
+  (interactive)
+  (progn 
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  ;; company is an optional dependency. You have to
+  ;; install it separately via package-install
+  ;; `M-x package-install [ret] company`
+  (company-mode +1)))
+(use-package tide
+  ;;:ensure t
+  :defer 1
+;;  :mode (("\\.ts\\'" . typescript-mode))
+  :config
+  (progn
+    (add-hook 'before-save-hook 'tide-format-before-save)
+    (add-hook 'typescript-mode-hook #'setup-tide-mode)))
+(use-package typescript
+  :defer 1
+  :mode ("\\.ts\\'" . typescript-mode))
